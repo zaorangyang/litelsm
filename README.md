@@ -1,0 +1,1 @@
+litelsm is a key-value storage engine that utilizes the LSM data structure at its core. I implemented it to deepen my understanding of LSM.
