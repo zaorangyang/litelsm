@@ -13,6 +13,7 @@
 #include <sys/types.h>
 #include <system_error>
 #include <filesystem>
+#include <functional>
 
 #include "util/slice.h"
 #include "util/status.h"
