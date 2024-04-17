@@ -31,6 +31,8 @@ set(LITELSM_STATIC_LIB litelsm)
 
 set(SOURCES 
     filesystem/posix_filesystem.cpp
+    filesystem/posix_file.cpp
+    filesystem/io_error.cpp
     util/uuid_gen.cpp
     )
 
@@ -49,6 +51,7 @@ if(WITH_TESTS)
         util/uuid_gen_test.cpp
         util/defer_op_test.cpp
         filesystem/filesystem_test.cpp
+        filesystem/posix_file_test.cpp
     )
     message(STATUS "TESTS: ${TESTS}")
     foreach(sourcefile ${TESTS})

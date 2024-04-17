@@ -16,9 +16,11 @@ class Slice {
 public:
     Slice() : data_(""), size_(0) { }
 
-    Slice(const std::string& data) : data_(data.data()), size_(data.size()) { }
+    Slice(const std::string& data) : data_(data.data()), size_(data.size()) {}
 
-    Slice(const uint8_t* data, size_t size) : data_(reinterpret_cast<const char*>(data)), size_(size) { }
+    Slice(const char* data, size_t size) : data_(data), size_(size) {}
+
+    Slice(const uint8_t* data, size_t size) : data_(reinterpret_cast<const char*>(data)), size_(size) {}
 
     const char* data() const {
         return data_;
