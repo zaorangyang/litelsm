@@ -8,6 +8,7 @@
 
 #include "util/slice.h"
 #include "util/status.h"
+#include "file.h"
 
 namespace litelsm {
 
@@ -26,7 +27,11 @@ public:
     virtual Status fileExists(const std::string& fname) = 0;
     virtual Status listDir(const std::string& dir, std::vector<std::string>* result) = 0;
     virtual Status removeFile(const std::string& path) = 0;
-    virtual Status createFile(const std::string& path) = 0;
+    // Create a new read-write file. If the file already exists, it will be truncated.
+    virtual Status newRWFile(const std::string& fname, std::unique_ptr<File>* file) = 0;
+    // Reopen a new read-write file. If the file already exists, it will be appened.
+    virtual Status repenRWFile(const std::string& fname, std::unique_ptr<File>* file) = 0;
+    virtual Status openReadableFile(const std::string& fname, std::unique_ptr<File>* file) = 0;
     virtual ~FileSystem() = default;
     static std::shared_ptr<FileSystem> defaultFileSystem();
     virtual FileSystemType getFileSystemType() = 0;

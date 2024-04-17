@@ -9,7 +9,7 @@ TEST(UUIDGenTest, GeneratesValidUUID) {
     std::string uuid = generateUUID();
 
     // Regular expression pattern to match UUID format
-    std::regex pattern(R"([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})");
+    std::regex pattern(R"([0-9a-fA-F]{8}_[0-9a-fA-F]{4}_[0-9a-fA-F]{4}_[0-9a-fA-F]{4}_[0-9a-fA-F]{12})");
 
     // Check if the generated UUID matches the expected format
     EXPECT_TRUE(std::regex_match(uuid, pattern));

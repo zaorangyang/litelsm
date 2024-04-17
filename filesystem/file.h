@@ -10,18 +10,20 @@
 #include <cstddef>
 
 #include "util/slice.h"
+#include "util/status.h"
 
 namespace litelsm {
 
 class File {
 public:
     File() = default;
-    virtual ~File() = 0;
-    virtual void append(const Slice& slice) = 0;
-    virtual void flush() = 0;
-    virtual void close() = 0;
-    virtual void sync() = 0;
-    virtual void read(uint64_t offset, size_t size, Slice* data) = 0;
+    virtual ~File() = default;
+    virtual Status append(const Slice& slice) = 0;
+    virtual Status flush() = 0;
+    virtual Status sync() = 0;
+    virtual Status close() = 0;
+    // The caller should ensure that the buffer is large enough to hold the data.
+    virtual Status read(uint64_t offset, size_t size, Slice* data, char* buf) = 0;
 };
 
 };  // namespace litelsm

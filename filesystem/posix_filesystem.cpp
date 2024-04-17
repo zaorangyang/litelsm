@@ -3,9 +3,6 @@
 //  COPYING file in the root directory) and Apache 2.0 License
 //  (found in the LICENSE.Apache file in the root directory).
 
-#ifndef FILESYSTEM_POSIX_FILESYSTEM_H_
-#define FILESYSTEM_POSIX_FILESYSTEM_H_
-
 #include <errno.h>
 #include <dirent.h>
 #include <unistd.h>
@@ -14,10 +11,14 @@
 #include <system_error>
 #include <filesystem>
 #include <functional>
+#include <fcntl.h>
 
+#include "io_error.h"
 #include "util/slice.h"
 #include "util/status.h"
 #include "filesystem.h"
+#include "file.h"
+#include "posix_file.h"
 
 namespace litelsm {
 
@@ -39,7 +40,11 @@ public:
 
     virtual Status removeFile(const std::string& fname);
 
-    virtual Status createFile(const std::string& fname);
+    virtual Status newRWFile(const std::string& fname, std::unique_ptr<File>* file);
+
+    virtual Status repenRWFile(const std::string& fname, std::unique_ptr<File>* file);
+
+    virtual Status openReadableFile(const std::string& fname, std::unique_ptr<File>* file);
 
     virtual ~PosixFileSystem() = default;
 
@@ -47,25 +52,11 @@ public:
         return FileSystemType::kPosix;
     }
 
+private:
+    Status openRWFile(const std::string& fname, bool isTrunc, std::unique_ptr<File>* file);
+
     Status iterateDir(const std::string& dir, const std::function<bool(std::string_view)>& cb);
 };
-
-static Status ioError(const std::string& context, int err_number) {
-    std::string msg;
-    switch (err_number) {
-    case 0:
-        return Status::OK();
-    case ENOENT:
-        msg = context + " " + std::strerror(err_number);
-        return Status::NotFound(msg);
-    case EEXIST:
-        msg = context + " " + std::strerror(err_number);
-        return Status::AlreadyExist(msg);
-    default:
-        msg = context + " " + std::strerror(err_number);
-        return Status::IOError(msg);
-    }
-}
 
 Status PosixFileSystem::makeDir(const std::string& dir) {
     if (mkdir(dir.c_str(), 0755) != 0) {
@@ -154,7 +145,34 @@ Status PosixFileSystem::removeFile(const std::string& fname) {
     return Status::OK();
 }
 
-Status PosixFileSystem::createFile(const std::string& path) {
+// Currently, we don't support verbose flags when creating a new file.
+Status PosixFileSystem::newRWFile(const std::string& fname, std::unique_ptr<File>* file) {
+    return openRWFile(fname, true, file);
+}
+
+Status PosixFileSystem::repenRWFile(const std::string& fname,  std::unique_ptr<File>* file) {
+    return openRWFile(fname, false, file);
+}
+
+Status PosixFileSystem::openRWFile(const std::string& fname, bool isNew, std::unique_ptr<File>* file) {
+    int flags = isNew ? (O_CREAT | O_TRUNC) : (O_CREAT | O_APPEND);
+    flags |= O_RDWR;
+    int fd = open(fname.c_str(), flags, 0644);
+    if (fd == -1) {
+        std::string errMsg = "While openning file " + fname;
+        return ioError(errMsg, errno);
+    }
+    file->reset(new PosixFile(fd, fname));
+    return Status::OK();
+}
+
+Status PosixFileSystem::openReadableFile(const std::string& fname, std::unique_ptr<File>* file) {
+    int fd = open(fname.c_str(), O_RDONLY);
+    if (fd == -1) {
+        std::string errMsg = "While openning file " + fname;
+        return ioError(errMsg, errno);
+    }
+    file->reset(new PosixFile(fd, fname));
     return Status::OK();
 }
 
@@ -164,5 +182,3 @@ std::shared_ptr<FileSystem> FileSystem::defaultFileSystem() {
 };
 
 };  // namespace litelsm
-
-#endif  // FILESYSTEM_POSIX_FILESYSTEM_H_
