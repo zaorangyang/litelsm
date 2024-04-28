@@ -28,10 +28,32 @@ public:
 
     size_t getSize() const { return size_; }
 
+    int inline compare(const Slice& b) const {
+        int ret = memcmp(data_, b.data_, std::min(size_, b.size_));
+        if (ret == 0) {
+            if (size_ == b.size_) {
+                return 0;
+            }
+            if (size_ < b.size_) {
+                return -1;
+            }
+            return 1;
+        }
+        return ret;
+    }
+
 private:
     const char* data_;
     size_t size_;
 };
+
+bool inline operator == (const Slice& a, const Slice& b) {
+    int ret = a.compare(b);
+    if (ret == 0) {
+        return true;
+    }
+    return false;
+}
 
 };  // namespace litelsm
 
