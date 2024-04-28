@@ -29,11 +29,16 @@ option(WITH_TESTS "build with tests" ON)
 
 set(LITELSM_STATIC_LIB litelsm)
 
-set(SOURCES 
+set(SOURCES
+    common/coding.cpp
+    common/comparator.cpp
     filesystem/posix_filesystem.cpp
     filesystem/posix_file.cpp
     filesystem/io_error.cpp
     util/uuid_gen.cpp
+    util/crc32c.cpp
+    storage/data_page_builder.cpp
+    storage/data_page_reader.cpp
     )
 
 set(SYSTEM_LIBS ${CMAKE_THREAD_LIBS_INIT})
@@ -50,8 +55,10 @@ if(WITH_TESTS)
         util/status_test.cpp
         util/uuid_gen_test.cpp
         util/defer_op_test.cpp
+        util/crc32c_test.cpp
         filesystem/filesystem_test.cpp
         filesystem/posix_file_test.cpp
+        storage/data_page_test.cpp
     )
     message(STATUS "TESTS: ${TESTS}")
     foreach(sourcefile ${TESTS})
