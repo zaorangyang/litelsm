@@ -226,7 +226,7 @@ Slice DataPageIterator::value() {
 };
 
 Iterator* DataPageReader::newIterator(const Comparator* comparator) {
-    return new DataPageIterator(data_, comparator);
+    return new DataPageIterator(rawData_, comparator);
 };
     
 };  // namespace litelsm

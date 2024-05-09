@@ -23,7 +23,7 @@ class DataPageReader : public PageReader {
 public:
     DataPageReader(const Slice& data) : PageReader(data) {}
     virtual ~DataPageReader() = default;
-    virtual Iterator* newIterator(const Comparator* comparator);
+    Iterator* newIterator(const Comparator* comparator);
 };
 
 };  // namespace litelsm

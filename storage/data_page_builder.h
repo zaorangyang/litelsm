@@ -24,21 +24,31 @@ class DataPageBuilder : public PageBuilder {
 public:
     static const uint8_t RestartPointInterval = 16;
 
-    DataPageBuilder() {
-        footer_.type = PageType::kDataPage;
+    DataPageBuilder(PageType type, size_t pageSize) {
+        pageSize_ = PAGESIZE;
+        footer_.type = type;
+        buffer_.reserve(pageSize_);
     }
 
-    DataPageBuilder(const PageBuilderOptions& options) : PageBuilder(options) {
-        footer_.type = PageType::kDataPage;
-    }
+    DataPageBuilder() : DataPageBuilder(PageType::kDataPage, PAGESIZE) {}
+
+    DataPageBuilder(PageType type) : DataPageBuilder(type, PAGESIZE) {}
+
+    DataPageBuilder(const PageBuilderOptions& options) : DataPageBuilder(PageType::kDataPage, options.pageSize) {}
 
     virtual ~DataPageBuilder() = default;
 
-    static inline size_t estimateEntrySize(const Slice& key, const Slice& value) {
+    static size_t estimateEntrySize(const Slice& key, const Slice& value) {
         return varint_length(key.getSize()) + key.getSize() + varint_length(value.getSize()) + value.getSize() + sizeof(uint32_t);
     }
 
-    inline size_t estimateSize() {
+    void reset() {
+        buffer_.clear();
+        restartPointOffsets_.clear();
+        recordNum_ = 0;
+    }
+
+    size_t estimateSize() {
         return buffer_.size() + sizeof(PageFooter) + sizeof(uint32_t) + (1 + restartPointOffsets_.size()) * sizeof(uint32_t);
     }
 
@@ -54,7 +64,7 @@ public:
 
     virtual void add(const Slice& key, const Slice& value);
 
-    inline size_t getRecordNum() const {
+    size_t getRecordNum() const {
         return recordNum_;
     }
 

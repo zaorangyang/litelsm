@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <cstddef>
 #include <string>
+#include <assert.h>
 
 namespace litelsm {
 
@@ -19,6 +20,8 @@ public:
     Slice(const std::string& data) : data_(data.data()), size_(data.size()) {}
 
     Slice(const char* data, size_t size) : data_(data), size_(size) {}
+
+    Slice(const char* s) : data_(s), size_(strlen(s)) {}
 
     Slice(const uint8_t* data, size_t size) : data_(reinterpret_cast<const char*>(data)), size_(size) {}
 
@@ -40,6 +43,13 @@ public:
             return 1;
         }
         return ret;
+    }
+
+    std::string ToString() const { return std::string(data_, size_); }
+
+    char operator [] (size_t index) const {
+        assert(index < size_);
+        return data_[index];
     }
 
 private:
