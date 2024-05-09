@@ -21,7 +21,8 @@ namespace litelsm {
 enum class PageType : uint8_t
 {
     kDataPage = 0,
-    kIndexPage = 1
+    kIndexPage = 1,
+    kFilterPage = 2
 };
 
 #pragma pack(push, 1)
@@ -43,29 +44,15 @@ struct PageBuilderOptions
 class PageBuilder {
 public:
     using RecordLengthType = uint32_t;
-    PageBuilder() {
-        pageSize_ = PAGESIZE;
-        buffer_.reserve(pageSize_);
-    }
-
-    PageBuilder(const PageBuilderOptions& options) {
-        pageSize_ = options.pageSize;
-        buffer_.reserve(pageSize_);
-    }
 
     virtual ~PageBuilder() = default;
 
-    // Add a key-value pair to the page.
-    // The key must be lexicographically greater than the previous key added.
-    virtual void add(const Slice& key, const Slice& value) = 0;
-
-    inline void reset () {
-        buffer_.clear();
-        footer_.checksum = 0;
+    size_t pageSize() const {
+        return pageSize_;
     }
 
-    inline size_t pageSize() const {
-        return pageSize_;
+    PageType type() const {
+        return footer_.type;
     }
 
     Slice finish() {

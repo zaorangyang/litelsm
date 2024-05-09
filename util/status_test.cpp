@@ -36,7 +36,7 @@ TEST(StatusTest, testStatus) {
     EXPECT_EQ(status6.code(), StatusCode::kCorruption);
     EXPECT_EQ(status6.message(), "hello");
 
-    Status status7(StatusCode::kNotSupported, "world");
+    Status status7(StatusCode::kNotSupported, std::string("world"));
     EXPECT_EQ(status7.code(), StatusCode::kNotSupported);
     EXPECT_EQ(status7.message(), "world");
 }

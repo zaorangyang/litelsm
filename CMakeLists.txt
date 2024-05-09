@@ -37,8 +37,12 @@ set(SOURCES
     filesystem/io_error.cpp
     util/uuid_gen.cpp
     util/crc32c.cpp
+    util/hash.cpp
+    util/bloom.cpp
+    util/string_util.cpp
     storage/data_page_builder.cpp
     storage/data_page_reader.cpp
+    storage/filter_page.cpp
     )
 
 set(SYSTEM_LIBS ${CMAKE_THREAD_LIBS_INIT})
@@ -56,9 +60,12 @@ if(WITH_TESTS)
         util/uuid_gen_test.cpp
         util/defer_op_test.cpp
         util/crc32c_test.cpp
+        util/hash_test.cpp
+        util/bloom_test.cpp
         filesystem/filesystem_test.cpp
         filesystem/posix_file_test.cpp
         storage/data_page_test.cpp
+        storage/filter_page_test.cpp
     )
     message(STATUS "TESTS: ${TESTS}")
     foreach(sourcefile ${TESTS})
